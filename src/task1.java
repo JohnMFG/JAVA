@@ -10,44 +10,44 @@ class TicketReservationSystem {
     }
 
     //synchronized to avoid data racing issue
-    // public synchronized void bookTickets(int numberOfTickets) {
-    //     if (availableSeats >= numberOfTickets) {
+    public  void bookTickets(int numberOfTickets) {
+        if (availableSeats >= numberOfTickets) {
 
-    //         try {
-    //             Thread.sleep(500); // Using delay to make data race issue bigger
-    //         } catch (InterruptedException e) {
-    //             e.printStackTrace();
-    //         }
-    //         availableSeats -= numberOfTickets;
-    //         System.out.println(Thread.currentThread().getName() + " booked " + numberOfTickets + " tickets.");
-    //     } else {
-    //         System.out.println(Thread.currentThread().getName() + " couldn't book tickets. Not enough available seats.");
-    //     }
-    // }
-
-    public void bookTickets(int numberOfTickets) {
-        boolean canBook = false;
-
-        synchronized (this) {
-            if (availableSeats >= numberOfTickets) {
-                availableSeats -= numberOfTickets;
-                canBook = true;
-            }
-        }
-
-    if (canBook) {
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            // availableSeats -= numberOfTickets;
+            // try {
+            //     Thread.sleep(500); // Using delay to make data race issue bigger
+            // } catch (InterruptedException e) {
+            //     e.printStackTrace();
+            // }
+            availableSeats -= numberOfTickets;
             System.out.println(Thread.currentThread().getName() + " booked " + numberOfTickets + " tickets.");
         } else {
             System.out.println(Thread.currentThread().getName() + " couldn't book tickets. Not enough available seats.");
         }
     }
+
+    // public void bookTickets(int numberOfTickets) {
+    //     boolean canBook = false;
+
+    //     synchronized (this) {
+    //         if (availableSeats >= numberOfTickets) {
+    //             availableSeats -= numberOfTickets;
+    //             canBook = true;
+    //         }
+    //     }
+
+    // if (canBook) {
+
+    //         try {
+    //             Thread.sleep(500);
+    //         } catch (InterruptedException e) {
+    //             e.printStackTrace();
+    //         }
+    //         // availableSeats -= numberOfTickets;
+    //         System.out.println(Thread.currentThread().getName() + " booked " + numberOfTickets + " tickets.");
+    //     } else {
+    //         System.out.println(Thread.currentThread().getName() + " couldn't book tickets. Not enough available seats.");
+    //     }
+    // }
 }
 
 public class task1 {
@@ -66,4 +66,19 @@ public class task1 {
         thread1.start();
         thread2.start();
     }
+}
+
+
+class calculations
+{
+    // Laukas, kurį skaitys modifikuos kelios gijos
+    int n;
+	
+	// Metodas modifikuojantis objekto turinį
+	public void padidinti() 
+        {
+           int nn = n; // Nuskaityti
+           nn++;       // Apskaiciuoti
+           n = nn;     // Isiminti objekto lauke
+        }
 }
