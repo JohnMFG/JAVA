@@ -1,26 +1,43 @@
 //Jonas Mažeika
 //Demonstration of the concurrent addition of elements to a shared list by two separate threads
-//Corect output: 60
-//To get wrong answer comment synchronized block and uncomment line below this block
-//Since CS is quite small it's not needed to divide it into smaller sections.
+//Corect output: 200
+//To get correct output, comment : lock();
+                                // sharedArray[index++] = value + 1;
+                                // unlock();
 
-import java.util.ArrayList;
-import java.util.List;
+                                //And uncomment synchronized (sharedArray)
+//CS is correct
 
- class ListAccess {
-    private static List<Integer> sharedList = new ArrayList<>();
+class CustomListAccess {
+    private static int[] sharedArray = new int[2000];
+    private static int index = 0;
+
+    private static volatile boolean isAdding = false;
+
+    private static void lock() {
+        while (isAdding) {
+            System.out.println("Locked");
+        }
+        isAdding = true;
+    }
+
+    private static void unlock() {
+        isAdding = false;
+    }
 
     private static void addToSharedList(int value) {
-        for (int i = 0; i < 30; i++) { //CS section starts
-            synchronized (sharedList) { 
-                sharedList.add(value);
-            }
-            //sharedList.add(value);
-        } //CS section ends
+        for (int i = 0; i < 1000; i++) {
+            lock();
+            sharedArray[index++] = value + 1;
+            unlock();
+
+            // synchronized (sharedArray) {
+            //     sharedArray[index++] = value + 1;
+            // }
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {
-
         Thread thread1 = new Thread(() -> addToSharedList(1));
         Thread thread2 = new Thread(() -> addToSharedList(2));
 
@@ -30,7 +47,14 @@ import java.util.List;
         thread1.join();
         thread2.join();
 
-        System.out.println("Correct aswer: 60");
-        System.out.println("Output resut: " + sharedList.size());
+        int count = 0;
+        for (int i : sharedArray) {
+            if (i != 0) {
+                count++;
+            }
+        }
+
+        System.out.println("Correct answer: 2000");
+        System.out.println("Output result: " + count);
     }
 }
