@@ -4,15 +4,11 @@
 
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 public class QuickSortParallel {
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.out.println("Usage: java QuickSortParallel <numThreads> <arraySize> <debugMode>");
+            System.out.println("To few arguments");
             System.exit(1);
         }
 
@@ -28,7 +24,7 @@ public class QuickSortParallel {
         System.out.println("Sorting an array of size " + arraySize + " with " + numThreads + " threads.");
 
         if (debugMode) {
-            System.out.println("Debugging Mode: Program execution will be artificially slowed down.");
+            System.out.println("Debugging mode.");
         }
 
         long startTime = System.currentTimeMillis();
@@ -40,62 +36,49 @@ public class QuickSortParallel {
     }
 
     public static void quickSortParallel(int[] arr, int numThreads) {
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        Thread[] threads = new Thread[numThreads];
 
-        try {
-            executor.invokeAll(Arrays.asList(new QuickSortTask(arr, 0, arr.length - 1)));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            executor.shutdown();
+        for (int i = 0; i < numThreads; i++) {
+            final int start = i * (arr.length / numThreads);
+            final int end = (i == numThreads - 1) ? arr.length - 1 : start + (arr.length / numThreads) - 1;
+
+            threads[i] = new Thread(() -> {
+                quickSort(arr, start, end);
+            });
+            threads[i].start();
+        }
+
+        for (int i = 0; i < numThreads; i++) {
             try {
-                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                threads[i].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static class QuickSortTask implements Callable<Void> {
-        private final int[] arr;
-        private final int left;
-        private final int right;
-
-        public QuickSortTask(int[] arr, int left, int right) {
-            this.arr = arr;
-            this.left = left;
-            this.right = right;
+    public static void quickSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int partitionIndex = partition(arr, left, right);
+            quickSort(arr, left, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, right);
         }
+    }
 
-        @Override
-        public Void call() {
-            quickSort(arr, left, right);
-            return null;
-        }
-
-        private void quickSort(int[] arr, int left, int right) {
-            if (left < right) {
-                int partitionIndex = partition(arr, left, right);
-                quickSort(arr, left, partitionIndex - 1);
-                quickSort(arr, partitionIndex + 1, right);
+    public static int partition(int[] arr, int left, int right) {
+        int pivot = arr[right];
+        int i = left - 1;
+        for (int j = left; j < right; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
             }
         }
-
-        private int partition(int[] arr, int left, int right) {
-            int pivot = arr[right];
-            int i = left - 1;
-            for (int j = left; j < right; j++) {
-                if (arr[j] <= pivot) {
-                    i++;
-                    int temp = arr[i];
-                    arr[i] = arr[j];
-                    arr[j] = temp;
-                }
-            }
-            int temp = arr[i + 1];
-            arr[i + 1] = arr[right];
-            arr[right] = temp;
-            return i + 1;
-        }
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[right];
+        arr[right] = temp;
+        return i + 1;
     }
 }
