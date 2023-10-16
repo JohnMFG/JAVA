@@ -1,3 +1,6 @@
+//Jonas Mažeika
+//Using semaphore to simulate acquiring and realeasing resource for the threads
+
 class OrdinarySemaphore {
     private int availableResources;
 
@@ -10,14 +13,14 @@ class OrdinarySemaphore {
 
     public synchronized void request() throws InterruptedException {
         while (availableResources == 0) {
-            wait(); // Wait until a resource is released
+            wait();
         }
         availableResources--;
     }
 
     public synchronized void release() {
         availableResources++;
-        notify(); // Notify a waiting thread that a resource is available
+        notify();
     }
 
     public synchronized int numberAvailable() {
@@ -25,17 +28,19 @@ class OrdinarySemaphore {
     }
 }
 
-class Semaphore {
+ class Semaphore {
     public static void main(String[] args) {
-        final OrdinarySemaphore semaphore = new OrdinarySemaphore(2);
+        int startingResource =2;
+        final OrdinarySemaphore semaphore = new OrdinarySemaphore(startingResource);
+        System.out.println("Starting resources: " + startingResource);
 
         Runnable resourceConsumerA = () -> {
             try {
                 semaphore.request();
                 System.out.println("Thread A acquired a resource.");
                 simulateResourceUsage();
+                System.out.println("Thread A releasing a resource.");
                 semaphore.release();
-                System.out.println("Thread A released a resource.");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -46,8 +51,8 @@ class Semaphore {
                 semaphore.request();
                 System.out.println("Thread B acquired a resource.");
                 simulateResourceUsage();
+                System.out.println("Thread B releasing a resource.");
                 semaphore.release();
-                System.out.println("Thread B released a resource.");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -58,8 +63,8 @@ class Semaphore {
                 semaphore.request();
                 System.out.println("Thread C acquired a resource.");
                 simulateResourceUsage();
+                System.out.println("Thread C releasing a resource.");
                 semaphore.release();
-                System.out.println("Thread C released a resource.");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -68,18 +73,19 @@ class Semaphore {
         Thread threadA = new Thread(resourceConsumerA);
         Thread threadB = new Thread(resourceConsumerB);
         Thread threadC = new Thread(resourceConsumerC);
-        
-        
-        runThreads(threadA, threadB, threadC);
+
+        runThreads(semaphore, threadA, threadB, threadC);
     }
 
-    private static void runThreads(Thread... threads) {
+    private static void runThreads(OrdinarySemaphore semaphore, Thread... threads) {
         for (Thread thread : threads) {
             thread.start();
         }
         joinThreads(threads);
-        System.out.println("Number of available resources: " + threads[0].getState().name());
+        
+        System.out.println("Number of available resources in the end: " + semaphore.numberAvailable());
     }
+    
 
     private static void simulateResourceUsage() throws InterruptedException {
         int result = 0;
