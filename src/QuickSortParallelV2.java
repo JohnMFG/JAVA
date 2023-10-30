@@ -5,34 +5,36 @@ import java.util.concurrent.ForkJoinPool;
 public class QuickSortParallelV2 {
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.out.println("To few arguments");
+            System.out.println("Too few arguments");
             System.exit(1);
         }
-
+    
         int numThreads = Integer.parseInt(args[0]);
         int arraySize = Integer.parseInt(args[1]);
         boolean debugMode = Boolean.parseBoolean(args[2]);
-
+    
+        System.out.println("Sorting an array of size " + arraySize + " with " + numThreads + " threads.");
+        System.out.println("#nThreads #workload #timeS #speedup");
+    
         int[] array = new int[arraySize];
         for (int i = 0; i < arraySize; i++) {
             array[i] = (int) (Math.random() * 1000);
         }
-
-        System.out.println("Sorting an array of size " + arraySize + " with " + numThreads + " threads.");
-
+    
+    
         if (debugMode) {
             System.out.println("Debugging mode");
         }
-
+    
         long startTime = System.currentTimeMillis();
-
+    
         ForkJoinPool pool = new ForkJoinPool(numThreads);
         pool.invoke(new QuickSortTask(array, 0, arraySize - 1, debugMode));
-
+    
         long endTime = System.currentTimeMillis();
-
-        System.out.println("Sorted array: " + Arrays.toString(array));
-        System.out.println("Execution time: " + (endTime - startTime) + " ms");
+    
+        System.out.println(numThreads + " " + arraySize + " " + (endTime - startTime) / 1000.0 + " " + calculateSpeedup(numThreads, (endTime - startTime) / 1000.0));
+        // System.out.println("Sorted array: " + Arrays.toString(array));
     }
 
     public static class QuickSortTask extends RecursiveAction {
@@ -87,5 +89,9 @@ public class QuickSortParallelV2 {
             arr[right] = temp;
             return i + 1;
         }
+    }
+
+    private static double calculateSpeedup(int numThreads, double executionTime) {
+        return (numThreads == 1) ? 1.0 : (1.282 / executionTime);
     }
 }
