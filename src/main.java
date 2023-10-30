@@ -26,15 +26,16 @@ class CustomListAccess {
     }
 
     private static void addToSharedList(int value) {
-        for (int i = 0; i < 1000; i++) {
-            lock();
-            sharedArray[index++] = value + 1;
-            unlock();
+        for (int i = 0; i < 1000; i++) { //CS begins
+            // lock();
+            // sharedArray[index++] = value + 1;
+            // unlock();
 
-            // synchronized (sharedArray) {
-            //     sharedArray[index++] = value + 1;
-            // }
-        }
+            synchronized (sharedArray) {
+                sharedArray[index++] = value + 1;
+            }
+            
+        } //CS ends
     }
 
     public static void main(String[] args) throws InterruptedException {

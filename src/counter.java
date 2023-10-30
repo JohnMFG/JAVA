@@ -47,7 +47,7 @@ class Race {
             e.printStackTrace();
         }
 
-        System.out.println("Correct Scenario: Synchronized Resource");
+        System.out.println("Correct Scenario: 0");
         System.out.println("Resource Value: " + resource.getValue());
     }
 }
