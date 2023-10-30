@@ -72,6 +72,7 @@ public class QuickSortParallelV2 {
 
         private int partition(int[] arr, int left, int right) {
             int pivot = arr[right];
+            //System.out.println("Pivot: "+ arr[right]);
             int i = left - 1;
             for (int j = left; j < right; j++) {
                 if (arr[j] <= pivot) {
