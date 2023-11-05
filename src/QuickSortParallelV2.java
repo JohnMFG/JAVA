@@ -35,6 +35,8 @@ public class QuickSortParallelV2 {
     
         System.out.println(numThreads + " " + arraySize + " " + (endTime - startTime) / 1000.0 + " " + calculateSpeedup(numThreads, (endTime - startTime) / 1000.0));
         // System.out.println("Sorted array: " + Arrays.toString(array));
+        // long duration = (endTime-startTime) / 1000.0;
+        System.out.println((endTime-startTime) / 1000.0);
     }
 
     public static class QuickSortTask extends RecursiveAction {
